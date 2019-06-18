@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style type="text/css">
+		canvas {
+			background: #eee;
+		}
+	</style>
+</head>
+<body>
+	<canvas></canvas>
+	<script type="text/javascript">
+		var box = function(obj) {
+			if (!obj) {
+				obj = {
+					width: 500,
+					height: 500,
+					r: 200
+				}
+			}
+			var c1 = document.getElementsByTagName('canvas')[0];
+			this.ctx = c1.getContext('2d')
+			c1.width = obj.width
+			c1.height = obj.height
+			this.width = obj.width
+			this.height = obj.height
+			this.r = obj.r
+			setInterval(() => {
+				this.init()
+				this.time()
+			}, 1000)
+		}
+
+		box.prototype.init = function() {
+     	this.ctx.clearRect(0, 0, this.width, this.height);
+     	this.ctx.save()
+			this.ctx.translate(this.width/2,this.height/2);
+			this.ctx.beginPath();
+	    this.ctx.lineWidth = this.r*0.05;//轮廓圆宽度
+	    this.ctx.strokeStyle = "#333";//轮廓圆颜色
+			//圆
+			this.ctx.arc(0, 0, this.r, 0, 2*Math.PI)
+			this.ctx.stroke(); // 画完
+			this.ctx.closePath(); // 闭合
+
+
+			//内圆
+			this.ctx.beginPath();
+			this.ctx.lineWidth = 1
+	    this.ctx.strokeStyle = "#666";//轮廓圆颜色
+			this.ctx.arc(0, 0, this.r * 0.9, 0, 2*Math.PI)
+			this.ctx.stroke();
+			this.ctx.closePath();
+
+			//画点
+			var hour = [6,5,4,3,2,1,12,11,10,9,8,7],i = 0;
+			for(var deg = 0; deg < 360; deg = deg + 6) {
+				var spotX = this.r * 0.9 * Math.sin(deg * 2 * Math.PI / 360)
+				var spotY = this.r * 0.9 * Math.cos(deg * 2 * Math.PI / 360)
+				var spot = this.r * 0.02
+				this.ctx.beginPath();
+        this.ctx.fillStyle = "#ccc";
+        if (deg % 30 == 0) {
+        	this.ctx.fillStyle = "#333";
+        	spot = this.r*0.025;
+        	var textX =(this.r * 0.9*0.85)*Math.sin(deg*2*Math.PI/360); //文字x坐标
+          var textY =(this.r * 0.9*0.85)*Math.cos(deg*2*Math.PI/360); //文字y坐标
+          this.ctx.font = this.r*0.1 + "px Arial"; 
+          this.ctx.textBaseline = "middle";// 文字垂直对齐方式
+          this.ctx.textAlign = "center";   // 文字水平对齐方式
+          this.ctx.fillText(hour[i],textX,textY);
+          i++;
+        }
+
+
+        this.ctx.arc(spotX,spotY,spot,0,2*Math.PI);
+        this.ctx.fill();
+        this.ctx.closePath();			
+			}
+			// 画中心
+	    this.ctx.beginPath();
+	    this.ctx.arc(0,0,this.r*0.05,0,2*Math.PI);
+	    this.ctx.stroke();
+	    this.ctx.closePath();
+		}
+
+		box.prototype.time = function() {
+			var date = new Date()
+			this.date = {
+				h: date.getHours() + date.getMinutes() / 60,
+				m: date.getMinutes() + date.getSeconds() / 60,
+				s: date.getSeconds()
+			}
+     	this.ctx.save()
+			//时
+	    this.ctx.beginPath();
+	    this.ctx.rotate(2 * Math.PI / 12 * this.date.h); //关键
+	    this.ctx.lineWidth = 3;
+	    this.ctx.lineCap = "round";
+	    this.ctx.moveTo(0, this.r * 0.4 * 0.2);
+	    this.ctx.lineTo(0, -this.r * 0.4 * 0.8);
+	    this.ctx.stroke();
+	    this.ctx.closePath();
+	    this.ctx.restore();
+
+			// 分
+	    this.ctx.beginPath();
+	    this.ctx.rotate(2 * Math.PI / 60 * this.date.m);
+	    this.ctx.lineWidth = 2;
+	    this.ctx.moveTo(0, this.r*0.6*0.2);
+	    this.ctx.lineTo(0, -this.r*0.6*0.8);
+	    this.ctx.stroke();
+	    this.ctx.closePath();
+
+			//秒
+	    this.ctx.beginPath();
+	    this.ctx.rotate(2 * Math.PI / 60 * this.date.s);
+	    this.ctx.strokeStyle = "#333";
+	    this.ctx.lineWidth = 1;
+	    this.ctx.lineCap = "round";
+	    this.ctx.moveTo(0, this.r* 0.8 * 0.2);
+	    this.ctx.lineTo(0, - this.r* 0.8 * 0.8);
+	    this.ctx.stroke(); 
+	    this.ctx.closePath();
+	    this.ctx.restore();
+		}
+		new box()
+	</script>
+</body>
+</html>
